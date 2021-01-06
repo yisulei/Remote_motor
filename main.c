@@ -126,20 +126,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
 //  HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_0);
 //	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_1);
-		if (Pos_Motor.Info.Electric!=0&&x==1)
+		if (Pos_Motor.Info.Electric!=0)
 		{
 			HAL_IWDG_Refresh(&hiwdg);
 		}
-		else if(x==0)
-		{
-			HAL_Delay(100);
-			if (x==0)
-			{
-				PID_Init(&Speed_Motor.Speed_PID,0,0,0,0,0,0,0);
-				PID_Init(&Pos_Motor.Speed_PID,0,0,0,0,0,0,0);
-				PID_Init(&Pos_Motor.Pos_PID,0,0,0,0,0,0,0);
-			}
-		}
+		
   }
   /* USER CODE END 3 */
 }
