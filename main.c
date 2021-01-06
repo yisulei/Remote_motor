@@ -55,7 +55,6 @@
 	Pos_System Pos_Motor;
   uint8_t RX_Data[8];
   uint8_t Tx_Data[8];
-extern	uint8_t x;
 	
 /* USER CODE END PV */
 
