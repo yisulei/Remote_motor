@@ -73,7 +73,6 @@ extern	Speed_System Speed_Motor;
 UART_RX_BUFFER Uart1_Rx;
 uint8_t a[18];
 uint8_t t;	
-uint8_t x=0;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -220,14 +219,13 @@ void SysTick_Handler(void)
 void CAN1_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN1_RX0_IRQn 0 */
-	x=1;
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
 	
-	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader,RX_Data);	
+  HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader,RX_Data);	
   Rx_Info_Analysis_State();
-	x=0;
+
 //	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_0);
 //	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_1);
 
@@ -245,7 +243,7 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
   Tx_Info_Analysis_State();
-	Send_To_Motor(&hcan1,Tx_Data);
+  Send_To_Motor(&hcan1,Tx_Data);
 	
   /* USER CODE END TIM2_IRQn 1 */
 }
