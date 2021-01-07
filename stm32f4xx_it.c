@@ -70,9 +70,14 @@ extern uint8_t Tx_Data[8];
 extern uint8_t RX_Data[8];
 extern	Motor_Speed_Info Motor;
 extern	Speed_System Speed_Motor;
+extern	Motor_Speed_Info Motor;
+extern	Speed_System Speed_Motor;
+extern	Pos_System Pos_Motor;
 UART_RX_BUFFER Uart1_Rx;
 uint8_t a[18];
-uint8_t t;	
+uint8_t t;
+extern uint8_t motor_state;
+
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -222,13 +227,11 @@ void CAN1_RX0_IRQHandler(void)
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
-	
-  HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader,RX_Data);	
+	motor_state=1;
+	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader,RX_Data);	
   Rx_Info_Analysis_State();
-
-//	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_0);
-//	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_1);
-
+	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_0);
+	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_1);
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
 
@@ -240,11 +243,34 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
   /* USER CODE END TIM2_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim2);
+    HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
-  Tx_Info_Analysis_State();
-  Send_To_Motor(&hcan1,Tx_Data);
-	
+	if (motor_state==1)
+	{
+		Tx_Info_Analysis_State();
+		Send_To_Motor(&hcan1,Tx_Data);
+		PID_Init(&Speed_Motor.Speed_PID,0.5,0,0,5000,0,5000,5000);
+		PID_Init(&Pos_Motor.Speed_PID,0.5,0,0,5000,0,5000,5000);
+		PID_Init(&Pos_Motor.Pos_PID,0.5,0,0,5000,0,5000,5000);
+	}
+//	else if(motor_state==0)
+//	{
+//		for(int i=0;i<8;i++)
+//		{
+//			Tx_Data[i]=0;
+//		}
+//		Tx_Info_Analysis_State();
+//		Send_To_Motor(&hcan1,Tx_Data);
+//		HAL_Delay(100);
+		else if (motor_state==0)
+		{
+			PID_Init(&Speed_Motor.Speed_PID,1,0,0,0,0,0,0);
+			PID_Init(&Pos_Motor.Speed_PID,0,0,0,0,0,0,0);
+			PID_Init(&Pos_Motor.Pos_PID,0,0,0,0,0,0,0);
+			Tx_Info_Analysis_State();
+		}
+
+	 motor_state=0;
   /* USER CODE END TIM2_IRQn 1 */
 }
 
